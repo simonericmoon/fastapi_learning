@@ -1,10 +1,16 @@
 from fastapi import FastAPI
 import uvicorn
+from pydantic import BaseModel
 
 app = FastAPI()
 
 products = []
 
+class Product(BaseModel):
+    id: int
+    name: str
+    price: float
+ 
 @app.get("/")
 async def get_products():
     return products
@@ -17,7 +23,7 @@ async def get_product(product_id: int):
     return {"error": "Product not found"}
 
 @app.put("/products/{product_id}")
-async def update_product(product_id: int, product: dict):
+async def update_product(product_id: int, product: Product):
     for index, p in enumerate(products):
         if p.get("id") == product_id:
             products[index] = product
@@ -36,6 +42,6 @@ async def delete_product(product_id: int):
 #    uvicorn.run(app, host="127.0.0.1", port=4444) # also runnable with uvicorn main:app --port 4444 --reload
 
 @app.post("/products")
-async def create_product(product: dict):
+async def create_product(product: Product):
     products.append(product)
     return {"sucess": "product added successfully"}
